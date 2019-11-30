@@ -2,19 +2,20 @@ from selenium import webdriver
 from time import sleep
 import re
 
+
+
 link = 'http://selenium1py.pythonanywhere.com/ru/'
 log_in_registration_link = 'http://selenium1py.pythonanywhere.com/ru/accounts/login/'
-# account_link = 'http://selenium1py.pythonanywhere.com/ru/accounts/profile/'
 
 languages_initial = ['ar', 'ca', 'cs', 'da', 'de', 'en-gb', 'el', 'es', 'fi', 'fr', 'it', 'ko', 'nl', 'pl', 'pt',
                      'pt-br', 'ro', 'ru', 'sk', 'uk', 'zh-hans']
 
-if re.findall(".com/(\w+\-\w+)", link):
-    language_list_from_link = re.findall(".com/(\w+\-\w+)", link)
+if re.findall('\.com/(\w+\-\w+)', link):
+    language_list_from_link = re.findall('\.com/(\w+\-\w+)', link)
     if language_list_from_link == ['zh-cn']:
         language_list_from_link = ['zh-hans']
 else:
-    language_list_from_link = re.findall(".com/(\w+)", link)
+    language_list_from_link = re.findall('\.com/(\w+)', link)
 
 assert len(language_list_from_link) == 1, \
     'Ошибка парсинга link при определении значения <language>, ожидается link в формате:\n' \
@@ -35,7 +36,7 @@ def test_1_1_view_language_nav_bar(link=link, languages_initial=languages_initia
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск поля выбора языка с выпадающим списком
         browser.find_element_by_xpath('//form[@id="language_selector"]/div/select[@name="language"]')
@@ -68,7 +69,7 @@ def test_1_2_view_log_in_registration_link(link=link, print_test_ok=True):
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск надписи-ссылки 'Войти или зарегистрироваться'
         browser.find_element_by_xpath('//ul[@class="nav navbar-nav navbar-right"]/li/a[@id="login_link"]')
@@ -91,7 +92,7 @@ def test_1_3_view_home_page_title(link=link, current_language=current_language, 
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск надписи-ссылки Oscar
         browser.find_element_by_xpath('//div[@class="col-sm-7 h1"]/a')
@@ -116,7 +117,7 @@ def test_1_4_view_store_drop_down(link=link, current_language=current_language):
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск элемента "Просмотр магазина"
         browser.find_element_by_xpath(
@@ -154,7 +155,7 @@ def test_1_5_view_basket_button(link=link, print_test_ok=True):
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск кнопки 'Посмотреть корзину' вместе с 'кнопкой-стрелочкой вниз' справа от кнопки 'Посмотреть корзину'
         browser.find_element_by_xpath('//div[@class="basket-mini pull-right hidden-xs"]/span[@class="btn-group"]')
@@ -175,7 +176,7 @@ def test_1_6_view_search_field_button(link=link, print_test_ok=True):
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поисковое поле
         browser.find_element_by_xpath(
@@ -197,13 +198,13 @@ def test_1_7_view_log_in_registration_page(link=link, current_language=current_l
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Поиск и клик по надписи-ссылке 'Войти или зарегистрироваться'
         log_in_registration_link = browser.find_element_by_xpath(
             '//ul[@class="nav navbar-nav navbar-right"]/li/a[@id="login_link"]')
         log_in_registration_link.click()
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Путь до текущего раздела
         browser.find_element_by_xpath('//div[@class="page_inner"]/ul[@class="breadcrumb"]')
@@ -242,7 +243,7 @@ def test_1_7_view_log_in_registration_page(link=link, current_language=current_l
 
 
 def test_1_8_view_top_log_in_registration_page():
-    """Проверка наличия основных элементов шапки страницы 'Войти или зарегистрироваться'"""
+    """Проверка наличия основных элементов шапки сайта на странице 'Войти или зарегистрироваться'"""
 
     # Проверка наличия элементов навигационной панели выбора языка
     test_1_1_view_language_nav_bar(link=log_in_registration_link, languages_initial=languages_initial,
@@ -263,7 +264,291 @@ def test_1_8_view_top_log_in_registration_page():
     print('test_1_8_view_top_log_in_registration_page - OK')
 
 
+def test_1_9_view_all_products(link=link):
+    """Проверка отображение товаров на странице в разделе 'Все товары''"""
 
+
+    try:
+        browser = webdriver.Chrome()
+        browser.get(link)
+        browser.implicitly_wait(10)
+
+
+        # Перейти в раздел 'Все товары'
+        all_products_link = browser.find_elements_by_xpath(
+            '//li[@class="dropdown active open"]/ul[@class="dropdown-menu"]/li/a[@href]')[0]
+        browser.implicitly_wait(5)
+        all_products_link.click()
+        browser.implicitly_wait(10)
+
+        number_of_products = browser.find_element_by_xpath('//form[@class="form-horizontal"]/strong[1]').text
+
+        all_products_on_current_page = browser.find_elements_by_xpath(
+            '//li[@class="col-xs-6 col-sm-4 col-md-3 col-lg-3"]')
+        assert len(all_products_on_current_page) > 0, 'В разделе "Все товары" не содержится ни одного товара.'
+
+        for letter in number_of_products:
+            assert letter in [str(i) for i in range(10)], 'Возвращаемое значение элемента должно быть числом.'
+
+        number_of_products = int(number_of_products)
+
+        if number_of_products >= 20:
+            assert len(all_products_on_current_page) == 20, \
+                'В заголовке первой страницы раздела всех товаров отображается общее число товаров={}, больше, либо ' \
+                'равное\nмаксимально отображаемому числу товаров на одной странице (20 товаров), но фактическое число ' \
+                'товаров={} на странице меньше 20.'.format(number_of_products, len(all_products_on_current_page))
+
+            start_number_of_products = browser.find_element_by_xpath('//form[@class="form-horizontal"]/strong[2]').text
+            for letter in start_number_of_products:
+                assert letter in [str(i) for i in range(10)], 'Возвращаемое значение элемента должно быть числом.'
+
+            start_number_of_products = int(start_number_of_products)
+
+            assert start_number_of_products == 1, 'Первое значение интервала количества товаров на странице={}, ' \
+                                                  'отображаемое в заголовке раздела, не равно 1.' \
+                                                  ''.format(start_number_of_products)
+
+            end_number_of_products = browser.find_element_by_xpath('//form[@class="form-horizontal"]/strong[3]').text
+            for letter in end_number_of_products:
+                assert letter in [str(i) for i in range(10)], 'Возвращаемое значение элемента должно быть числом.'
+
+            end_number_of_products = int(end_number_of_products)
+
+            assert end_number_of_products == 20, 'Последнее значение интервала количества товаров на странице={}, ' \
+                                                 'отображаемое в заголовке раздела, не равно 20.' \
+                                                 ''.format(end_number_of_products)
+        else:
+            assert len(all_products_on_current_page) == number_of_products, \
+                'Фактическое число товаров на странице={} не соответствует отображаемому в заголовке раздела общему ' \
+                'числу товаров={}.'.format(len(all_products_on_current_page), number_of_products)
+
+        for i in range(1, len(all_products_on_current_page) + 1):
+            assert len(browser.find_elements_by_xpath(
+            '//li[{}]/article/div[@class="image_container"]/a/img[@class="thumbnail"]'.format(i))) != 0, \
+                'У товара с порядковым номером={} на странице отсутствует изображение.'.format(i)
+            rating_starts = browser.find_elements_by_xpath('//li[{}]/article/p[@class="star-rating "]'.format(i))
+            assert len(rating_starts) != 0, 'У товара с порядковым номером={} на странице отсутствует панель рейтинга' \
+                                            ' со звёздами.'.format(i)
+            assert len(browser.find_elements_by_xpath('//li[{}]/article/p[@class="star-rating "]/i'.format(i))) == 5, \
+                'Количество звёзд в рейтинге не равно 5 для товара с порядковым номером={} на странице.'.format(i)
+            assert len(browser.find_elements_by_xpath('//li[{}]/article/h3/a'.format(i))) != 0, \
+                'У товара с порядковым номером={} на странице отсутствует название'.format(i)
+            assert len(browser.find_elements_by_xpath(
+                '//li[{}]/article/div[@class="product_price"]/p[@class="price_color"]'.format(i))) != 0, \
+                'У товара с порядковым номером={} на странице отсутствует элемент со стоимостью товара ' \
+                '(если цена товара не указана, элемент присутствует, но содержит пустое значение)'.format(i)
+            assert len(browser.find_elements_by_xpath(
+                '//li[{}]/article/div[@class="product_price"]/p[2]'.format(i))) != 0, \
+                'У товара с порядковым номером={} на странице отсутствует элемент статуса началия товара на складе' \
+                ''.format(i)
+            if len(browser.find_elements_by_xpath(
+                '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'.format(i))) != 0:
+                assert len(browser.find_elements_by_xpath(
+                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))) != 0, \
+                    'У товара с порядковым номером={} на странице, со статусом "в наличии", отсутствует ' \
+                    'кнопка "Добавить корзину".'.format(i)
+
+# TODO Добавить аналогичные проверки для товаров на всех страницах раздела, если страниц больше одной
+    # (предварительно должна быть проврека - страниц больше одной? Если да - тогда далее).
+    # TODO - Или можно это опустить? выходит за рамки решаемой в курсе Stepik задачи? (не такие важные проверки)
+
+# TODO Добавить аналогичные проверки для разделов Clothes, Books, "Предложения"
+    # TODO - Или можно это опустить? выходит за рамки решаемой в курсе Stepik задачи? (не такие важные праверки)
+
+    finally:
+        browser.quit()
+    print('test_1_9_view_all_products - OK')
+
+
+def test_1_10_check_go_to_product_page_and_view_it(link=link, current_language=current_language):
+    """Проверка загрузки страницы товара по клику на изображение и наименование товара.
+    Проверка отображения основных элементов на странице товара."""
+
+
+    try:
+        browser = webdriver.Chrome()
+        browser.get(link)
+        browser.implicitly_wait(10)
+
+        def go_to_home_page():
+            # Вернуться на домашнюю страницу
+            go_to_home_page = browser.find_element_by_xpath('//div[@class="col-sm-7 h1"]/a')
+            sleep(1)
+            browser.implicitly_wait(5)
+            go_to_home_page.click()
+            sleep(2)
+
+        def go_to_all_products():
+            # Перейти в раздел 'Все товары'
+            all_products_link = browser.find_elements_by_xpath(
+                '//li[@class="dropdown active open"]/ul[@class="dropdown-menu"]/li/a[@href]')[0]
+            browser.implicitly_wait(5)
+            all_products_link.click()
+            browser.implicitly_wait(10)
+
+        go_to_all_products()
+
+        all_products_on_current_page = browser.find_elements_by_xpath(
+            '//li[@class="col-xs-6 col-sm-4 col-md-3 col-lg-3"]')
+
+        if len(all_products_on_current_page) > 0:
+
+            # Перейти на страницу первого товара по клику на изображение
+            product_img_link = browser.find_element_by_xpath(
+                '//li[1]/article/div[@class="image_container"]/a/img[@class="thumbnail"]')
+            sleep(2)
+            browser.implicitly_wait(10)
+            product_img_link.click()
+
+            def check_product_info():
+                assert len(browser.find_elements_by_xpath('//div[@class="col-sm-6"]/div/div/div/div/img')) != 0, \
+                    'На странице товара отсутствует изображение товара.'
+                assert len(browser.find_elements_by_xpath('//div[@class="col-sm-6 product_main"]/h1')) != 0, \
+                    'На странице товара отсутствует элемент с названием товара.'
+
+                assert browser.find_element_by_xpath('//div[@class="col-sm-6 product_main"]/h1').text != '', \
+                    'На странице товара отсутствует название товара.'
+
+                product_name = browser.find_element_by_xpath('//div[@class="col-sm-6 product_main"]/h1').text
+
+                assert len(browser.find_elements_by_xpath(
+                    '//div[@class="col-sm-6 product_main"]/p[@class="price_color"]')) != 0, \
+                    'На странице товара отсутствует элемент со стоимостью товара.'
+                assert len(browser.find_elements_by_xpath(
+                    '//div[@class="col-sm-6 product_main"]/p[2]')) != 0, \
+                    'На странице товара отсутствует статус наличия товара.'
+                assert len(browser.find_elements_by_xpath(
+                    '//div[@class="col-sm-6 product_main"]/p[3]/a')) != 0, \
+                    'На странице товара отсутствует кнопка "Написать отзыв".'
+
+                if len(browser.find_elements_by_xpath(
+                        '//div[@class="col-sm-6 product_main"]/p[@class="instock availability"]')) > 0:
+                    assert len(browser.find_elements_by_xpath(
+                        '//form[@id="add_to_basket_form"]/button[@type="submit"]')) != 0, \
+                        'На странице товара с наименованием: "{}" со статусом "в наличии" отсутствует кнопка ' \
+                        '"Добавить в корзину".'.format(product_name)
+                    assert len(browser.find_elements_by_xpath(
+                        '//button[@class="btn btn-lg btn-wishlist"]')) != 0, \
+                        'На странице товара с наименованием: "{}" со статусом "в наличии" отсутствует кнопка ' \
+                        '"Написать отзыв".'.format(product_name)
+                    assert len(browser.find_elements_by_xpath(
+                        '//div[@id="product_description"]')) != 0, \
+                        'На странице товара на странице товара с наименованием: "{}" отсутствует элемент размещения ' \
+                        'заголовка "Описание товара".'.format(product_name)
+                    if current_language == 'ru':
+                        assert browser.find_element_by_xpath(
+                            '//div[@id="product_description"]/h2').text == 'Описание товара', \
+                            'Название раздела на странице товара с наименованием: "{}" не соответсвует ожидаемому - ' \
+                            '"Описание товара".'.format(product_name)
+                    assert len(browser.find_elements_by_xpath(
+                        '//article[@class="product_page"]/p')) != 0, \
+                        'На странице товара с наименованием: "{}" отсутствует абзац с описанием товара.' \
+                        ''.format(product_name)
+                    assert browser.find_element_by_xpath(
+                        '//article[@class="product_page"]/p').text != '', \
+                        'На странице товара с наименованием: "{}" отсутствует описание в разделе "Описание товара".' \
+                        ''.format(product_name)
+                    assert len(browser.find_elements_by_xpath(
+                        '//article[@class="product_page"]/div[3]')) != 0, \
+                        'На странице товара с наименованием: "{}" отсутствует элемент заголовка "Информация о товаре".' \
+                        ''.format(product_name)
+                    if current_language == 'ru':
+                        assert browser.find_element_by_xpath(
+                            '//article[@class="product_page"]/div[3]/h2').text == 'Информация о товаре', \
+                            'Название раздела на странице товара с наименованием: "{}" не соответсвует ожидаемому - ' \
+                            '"Информация о товаре".'.format(product_name)
+                    assert len(browser.find_elements_by_xpath(
+                        '//table[@class="table table-striped"]')) != 0, \
+                        'На странице товара с наименованием: "{}" отсутствует таблица с информацией о товаре.' \
+                        ''.format(product_name)
+
+                    assert len(browser.find_elements_by_xpath(
+                        '//table[@class="table table-striped"]/tbody/tr')) == 7, \
+                        'Количество строк в таблице с информацией о товаре с наименованием: "{}" не равно 7.' \
+                        ''.format(product_name)
+
+                    for i in range(1, len(browser.find_elements_by_xpath(
+                            '//table[@class="table table-striped"]/tbody/tr')) + 1):
+                        assert browser.find_element_by_xpath(('//table[@class="table table-striped"]/tbody/tr[{}]/th'
+                                                              ''.format(i))).text != '', \
+                            'В строке с номером={} по порядку таблицы информации о товаре с наименованием: "{}" ' \
+                            'отсутствует название параметра.'.format(i, product_name)
+                        if current_language == 'ru':
+                            assert browser.find_element_by_xpath((
+                                '//table[@class="table table-striped"]/tbody/tr[{}]/th'.format(i))).text in \
+                                   ['Артикул', 'Тип товара', 'Цена (без НДС)', 'Цена (с НДС)', 'Налог', 'Доступность',
+                                    'Количество отзывов'], 'Название параметра в строке с номером={} по порядку ' \
+                                                           'таблицы информации о товаре с наименованием: "{}" ' \
+                                                           'не соотвествует ожидаемому.'.format(i, product_name)
+
+                    assert len(browser.find_elements_by_xpath(
+                        '//section/div[@id="reviews"]')) != 0, \
+                        'На странице товара с наименованием: "{}" отсутствует элемент размещения заголовка ' \
+                        '"Отзывы Клиентов".'.format(product_name)
+
+                    if current_language == 'ru':
+                        assert browser.find_element_by_xpath(
+                            '//section/div[@id="reviews"]/h2').text == 'Отзывы Клиентов', \
+                            'Название раздела на странице товара с наименованием: "{}" не соответсвует ожидаемому - ' \
+                            '"Отзывы Клиентов".'.format(product_name)
+
+            check_product_info()
+
+            # Вернуться на домашнюю страницу
+            go_to_home_page()
+
+            # Перейти в раздел 'Все товары'
+            go_to_all_products()
+
+            all_products_on_current_page = browser.find_elements_by_xpath(
+                '//li[@class="col-xs-6 col-sm-4 col-md-3 col-lg-3"]')
+
+            if len(all_products_on_current_page) > 0:
+                # Перейти на страницу первого товара по клику на название
+                product_name_link = browser.find_element_by_xpath(
+                    '//li[1]/article/h3/a')
+                sleep(2)
+                browser.implicitly_wait(10)
+                product_name_link.click()
+
+                # Проверить отображение элементов страницы товара
+                check_product_info()
+
+            # Вернуться на домашнюю страницу
+            go_to_home_page()
+
+            # Перейти в раздел 'Все товары'
+            go_to_all_products()
+
+            if len(all_products_on_current_page) > 0:
+                for i in range(2, len(all_products_on_current_page) + 1):
+
+                    # Перейти на страницу товара по клику на название
+                    product_name_link = browser.find_element_by_xpath(
+                        '//li[{}]/article/h3/a'.format(i))
+                    sleep(2)
+                    browser.implicitly_wait(10)
+                    product_name_link.click()
+
+                    # Проверить отображение элементов страницы товара
+                    check_product_info()
+
+                    # Вернуться на домашнюю страницу
+                    go_to_home_page()
+
+                    # Перейти в раздел 'Все товары'
+                    go_to_all_products()
+
+    # TODO Добавить аналогичные проверки для товаров на всех страницах раздела, если страниц больше одной
+    # (предварительно должна быть проврека - страниц больше одной? Если да - тогда далее).
+    # TODO - Или можно это опустить? выходит за рамки решаемой в курсе Stepik задачи? (не такие важные проверки)
+
+    # TODO Добавить аналогичные проверки для разделов Clothes, Books, "Предложения"
+    # TODO - Или можно это опустить? выходит за рамки решаемой в курсе Stepik задачи? (не такие важные праверки)
+
+    finally:
+        browser.quit()
+    print('test_1_10_check_go_to_product_page_and_view_it - OK')
 
 
 def registration(link=link, input_email='true_email@test.ru', input_password='truepassw', email=True, password=True,
@@ -274,7 +559,7 @@ def registration(link=link, input_email='true_email@test.ru', input_password='tr
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
         # Переход по ссылке 'Войти или зарегистрироваться'
         log_in_registration_link = browser.find_element_by_xpath(
@@ -464,7 +749,7 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
     try:
         browser = webdriver.Chrome()
         browser.get(link)
-        browser.implicitly_wait(5)
+        browser.implicitly_wait(10)
 
 
         def delete_pass():
@@ -511,7 +796,7 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
             log_in_registration_link = browser.find_element_by_xpath(
                 '//ul[@class="nav navbar-nav navbar-right"]/li/a[@id="login_link"]')
             log_in_registration_link.click()
-            browser.implicitly_wait(5)
+            browser.implicitly_wait(10)
 
             # Ввести email в форме авторизации
             log_in_email_field = browser.find_element_by_xpath('//input[@name="login-username"]')
@@ -527,7 +812,7 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
 
             # Нажать кнопку Войти"
             log_in_button = browser.find_element_by_xpath('//button[@name="login_submit"]')
-            browser.implicitly_wait(5)
+            browser.implicitly_wait(10)
             log_in_button.click()
 
             if not skip_check:
@@ -625,7 +910,7 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
                 # Нажать кнопку "Сохранить"
                 save_button = browser.find_element_by_xpath(
                     '//form[@id="change_password_form"]/div[4]/div/button[@type="submit"]')
-                browser.implicitly_wait(5)
+                browser.implicitly_wait(10)
                 save_button.click()
 
                 if new_password:
@@ -665,10 +950,96 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
         browser.quit()
 
 
+def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, repeate_add_product=False):
+    """Добавить товар в корзину'"""
 
 
+    try:
+        browser = webdriver.Chrome()
+        browser.get(link)
+        browser.implicitly_wait(10)
 
+        def go_to_home_page():
+            # Вернуться на домашнюю страницу
+            go_to_home_page = browser.find_element_by_xpath('//div[@class="col-sm-7 h1"]/a')
+            sleep(1)
+            browser.implicitly_wait(5)
+            go_to_home_page.click()
+            sleep(1)
 
+        def go_to_all_products():
+            # Перейти в раздел 'Все товары'
+            all_products_link = browser.find_elements_by_xpath(
+                '//li[@class="dropdown active open"]/ul[@class="dropdown-menu"]/li/a[@href]')[0]
+            browser.implicitly_wait(5)
+            all_products_link.click()
+            browser.implicitly_wait(10)
+
+        go_to_all_products()
+
+        def add_product_to_basket():
+            all_products_on_current_page = browser.find_elements_by_xpath(
+                '//li[@class="col-xs-6 col-sm-4 col-md-3 col-lg-3"]')
+
+            if len(all_products_on_current_page) > 0:
+                for i in range(1, len(all_products_on_current_page) + 1):
+
+                    # Если товар в наличии
+                    if len(browser.find_elements_by_xpath(
+                            '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                            ''.format(i))) != 0:
+
+                        # Добавить товар в корзину
+                        add_to_basket_button = browser.find_element_by_xpath(
+                            '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                        sleep(2)
+                        browser.implicitly_wait(10)
+                        add_to_basket_button.click()
+                        break
+                    else:
+                        continue
+
+                # Перейти в корзину
+                go_to_basket_button = browser.find_element_by_xpath(
+                    '//div[@class="basket-mini pull-right hidden-xs"]/span[@class="btn-group"]')
+                sleep(1)
+                go_to_basket_button.click()
+                sleep(1)
+
+                number_of_products_before = len(browser.find_elements_by_xpath('//div[@class="basket-items"]'))
+
+                assert number_of_products_before == 1, 'В корзину бы добавлен 1 товар. Количество товаров в корзине={} ' \
+                                                'и не соответствует ожидаемому.'.format(number_of_products_before)
+
+        add_product_to_basket()
+
+        if clear_basket or repeate_add_product:
+            product_value = browser.find_element_by_xpath(
+                '//div[@class="checkout-quantity"]/div[@class="input-group  "]/input[@class="form-control"]')
+            sleep(1)
+
+            # Очистить корзину
+            product_value.clear()
+            product_value.send_keys('0')
+            update_button = browser.find_element_by_xpath(
+                '//span[@class="input-group-btn"]/button[@class="btn btn-default"]')
+
+            browser.implicitly_wait(10)
+            update_button.click()
+
+            number_of_products_after = len(browser.find_elements_by_xpath('//div[@class="basket-items"]'))
+
+            assert number_of_products_after == 0, 'В корзине был 1 товар, товар был удалён из корзины. ' \
+                                                  'Количество товаров в корзине={} и не равно 0.' \
+                                                  ''.format(number_of_products_after)
+
+            if repeate_add_product:
+                go_to_home_page()
+                go_to_all_products()
+                add_product_to_basket()
+
+    finally:
+        browser.quit()
 
 
 
@@ -771,46 +1142,33 @@ def test_2_11_cansel_delete_profile():
     """Отмена удаления профиля пользователя"""
 
     registration(link=link, delete_profile=True, cansel_delete_profile=True)
-    print('test_2_11_cansel_delete_profile')
+    print('test_2_11_cansel_delete_profile - OK')
+
+
+def test_2_12_add_one_product_to_basket(link=link):
+    """Добавить товар в корзину'"""
+
+    add_product_to_basket_and_clear_basket(link=link)
+    print('test_2_12_add_one_product_to_basket - OK')
+
+
+def test_2_13_clear_basket(link=link):
+    """Очистить корзину'"""
+
+    add_product_to_basket_and_clear_basket(link=link, clear_basket=True)
+    print('test_2_13_clear_basket - OK')
+
+
+def test_2_14_repeate_add_one_product_to_basket(link=link):
+    """Повторно добавить товар в корзину'"""
+
+    add_product_to_basket_and_clear_basket(link=link, repeate_add_product=True)
+    print('test_2_14_repeate_add_one_product_to_basket - OK')
 
 
 
+print('\n=========================== test session starts ===========================\n')
 
-
-
-
-
-def test_1_9_view_basket_button(link=link):
-    """Проверка наличия элемента с заголовком Oscar Sandbox"""
-
-
-    try:
-        browser = webdriver.Chrome()
-        browser.get(link)
-        browser.implicitly_wait(5)
-
-        # Поиск кнопки 'Посмотреть корзину' вместе с 'кнопкой-стрелочкой вниз' справа от кнопки 'Посмотреть корзину'
-        browser.find_element_by_xpath('//div[@class="basket-mini pull-right hidden-xs"]/span[@class="btn-group"]')
-
-        # Поиск кнопки-стрелочки вниз отдельно справа от кнопки 'Посмотреть корзину'
-        browser.find_element_by_xpath('//span[@class="btn-group"]/button[@class="btn btn-default dropdown-toggle"]')
-
-        # Поиск элемента 'Просмотр магазина'
-        browser.find_element_by_xpath('//div[@class="navbar-collapse primary-collapse collapse"]/ul[@class="nav navbar-nav"]')
-
-        # Поиск элементов раскрытого выпадающего списка под элементом 'Просмотр магазина'
-        browser.find_element_by_xpath('//li[@class="dropdown active open"]/ul[@class="dropdown-menu"]')
-
-        print("test_1_5_view_basket_button - OK")
-
-
-    finally:
-        sleep(1)
-        browser.quit()
-
-
-
-print("\n=========================== test session starts ===========================\n")
 # test_1_1_view_language_nav_bar()
 # test_1_2_view_log_in_registration_link()
 # test_1_3_view_home_page_title()
@@ -819,6 +1177,9 @@ print("\n=========================== test session starts =======================
 # test_1_6_view_search_field_button()
 # test_1_7_view_log_in_registration_page()
 # test_1_8_view_top_log_in_registration_page()
+# test_1_9_view_all_products()
+# test_1_10_check_go_to_product_page_and_view_it()
+
 # test_2_1_registration_true_data_and_delete_profile()
 # test_2_2_registration_false_password()
 # test_2_3_registration_false_email()
@@ -830,10 +1191,6 @@ print("\n=========================== test session starts =======================
 # test_2_9_change_password_true_data()
 # test_2_10_change_password_false_data()
 # test_2_11_cansel_delete_profile()
-
-
-
-
-
-
-# не забываем оставить пустую строку в конце файла
+test_2_12_add_one_product_to_basket()
+test_2_13_clear_basket()
+test_2_14_repeate_add_one_product_to_basket()
