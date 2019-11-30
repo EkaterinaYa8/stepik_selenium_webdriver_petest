@@ -42,4 +42,6 @@ def current_language(request):
 
 def pytest_addoption(parser):
     parser.addoption('--language', action='store', default='ru',
-                     help='Выбрать язык для загрузки сайта из списка значений:\n')
+                     help='Выбрать язык для загрузки сайта из списка значений:\n'
+                          '[\'ar\', \'ca\', \'cs\', \'da\', \'de\', \'en-gb\', \'el\', \'es\', \'fi\', \'fr\', \'it\', '
+                          '\'ko\', \'nl\', \'pl\', \'pt\', \'pt-br\', \'ro\', \'ru\', \'sk\', \'uk\', \'zh-cn\']')
