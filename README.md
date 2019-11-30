@@ -46,6 +46,6 @@
 	-k <test_name>
 	```
 	Например:
-		```bash
-	-k <test_1_1_view_language_nav_bar>
+	```bash
+	pytest -v -s test_all_web_site_tests.py -k test_1_1_view_language_nav_bar
 	```
