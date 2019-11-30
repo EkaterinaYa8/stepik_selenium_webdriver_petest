@@ -336,10 +336,10 @@ def test_1_9_view_all_products(link=link):
             assert len(browser.find_elements_by_xpath(
                 '//li[{}]/article/div[@class="product_price"]/p[@class="price_color"]'.format(i))) != 0, \
                 'У товара с порядковым номером={} на странице отсутствует элемент со стоимостью товара ' \
-                '(если цена товара не указана, элемент присутствует, но содержит пустое значение)'.format(i)
+                '(если цена товара не указана, элемент присутствует, но содержит пустое значение).'.format(i)
             assert len(browser.find_elements_by_xpath(
                 '//li[{}]/article/div[@class="product_price"]/p[2]'.format(i))) != 0, \
-                'У товара с порядковым номером={} на странице отсутствует элемент статуса началия товара на складе' \
+                'У товара с порядковым номером={} на странице отсутствует элемент статуса наличия товара на складе.' \
                 ''.format(i)
             if len(browser.find_elements_by_xpath(
                 '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'.format(i))) != 0:
@@ -507,7 +507,7 @@ def test_1_10_check_go_to_product_page_and_view_it(link=link, current_language=c
                 # Перейти на страницу первого товара по клику на название
                 product_name_link = browser.find_element_by_xpath(
                     '//li[1]/article/h3/a')
-                sleep(2)
+                # sleep(2)
                 browser.implicitly_wait(10)
                 product_name_link.click()
 
@@ -520,7 +520,7 @@ def test_1_10_check_go_to_product_page_and_view_it(link=link, current_language=c
             # Перейти в раздел 'Все товары'
             go_to_all_products()
 
-            if len(all_products_on_current_page) > 0:
+            if len(all_products_on_current_page) >= 2:
                 for i in range(2, len(all_products_on_current_page) + 1):
 
                     # Перейти на страницу товара по клику на название
@@ -738,7 +738,7 @@ def registration(link=link, input_email='true_email@test.ru', input_password='tr
 
 
 def log_in(link=link, input_email='true_email@test.ru', input_password='truepassw', input_new_password='truepassw1',
-           log_in=True, pre_registration=True, repeate_log_in=False, change_password=False, new_password=True,
+           log_in=True, pre_registration=True, repeat_log_in=False, change_password=False, new_password=True,
            delete_profile=True, current_language=current_language):
     """Аутентификация пользователя"""
 
@@ -867,7 +867,7 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
 
 
         if log_in:
-            if repeate_log_in:
+            if repeat_log_in:
                 # Выйти из профиля
                 exit_account = browser.find_element_by_xpath('//a[@id="logout_link"]')
                 sleep(2)
@@ -950,8 +950,10 @@ def log_in(link=link, input_email='true_email@test.ru', input_password='truepass
         browser.quit()
 
 
-def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, repeate_add_product=False):
-    """Добавить товар в корзину'"""
+def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, add_two_products=False,
+                                           add_several_products=False, repeat_add_product=False,
+                                           del_one_using_clear=False, add_from_product_page=False):
+    """Добавить товар в корзину. Очистить корзину.'"""
 
 
     try:
@@ -960,15 +962,18 @@ def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, repeat
         browser.implicitly_wait(10)
 
         def go_to_home_page():
-            # Вернуться на домашнюю страницу
+            """Вернуться на домашнюю страницу."""
+
             go_to_home_page = browser.find_element_by_xpath('//div[@class="col-sm-7 h1"]/a')
-            sleep(1)
+            # sleep(1)
             browser.implicitly_wait(5)
             go_to_home_page.click()
-            sleep(1)
+            browser.implicitly_wait(5)
+            # sleep(1)
 
         def go_to_all_products():
-            # Перейти в раздел 'Все товары'
+            """Перейти в раздел 'Все товары'."""
+
             all_products_link = browser.find_elements_by_xpath(
                 '//li[@class="dropdown active open"]/ul[@class="dropdown-menu"]/li/a[@href]')[0]
             browser.implicitly_wait(5)
@@ -977,11 +982,14 @@ def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, repeat
 
         go_to_all_products()
 
-        def add_product_to_basket():
+        def add_products_to_basket():
+            """Добавить товары в корзину."""
             all_products_on_current_page = browser.find_elements_by_xpath(
                 '//li[@class="col-xs-6 col-sm-4 col-md-3 col-lg-3"]')
+            num_products = 0
 
-            if len(all_products_on_current_page) > 0:
+            # Добавить товар в корзину со страницы с описанием товара
+            if add_from_product_page:
                 for i in range(1, len(all_products_on_current_page) + 1):
 
                     # Если товар в наличии
@@ -989,58 +997,236 @@ def add_product_to_basket_and_clear_basket(link=link, clear_basket=False, repeat
                             '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
                             ''.format(i))) != 0:
 
+                        # Перейти на страницу товара по клику на название
+                        product_name_link = browser.find_element_by_xpath(
+                            '//li[{}]/article/h3/a'.format(i))
+                        browser.implicitly_wait(10)
+                        product_name_link.click()
+
                         # Добавить товар в корзину
                         add_to_basket_button = browser.find_element_by_xpath(
-                            '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
-                        sleep(2)
+                            '//form[@id="add_to_basket_form"]/button[@type="submit"]')
                         browser.implicitly_wait(10)
                         add_to_basket_button.click()
+                        num_products += 1
                         break
+
+                    elif i == len(all_products_on_current_page) + 1:
+                        print('На странице нет ни одного товара в наличии.')
                     else:
                         continue
 
-                # Перейти в корзину
-                go_to_basket_button = browser.find_element_by_xpath(
-                    '//div[@class="basket-mini pull-right hidden-xs"]/span[@class="btn-group"]')
-                sleep(1)
-                go_to_basket_button.click()
-                sleep(1)
+                    add_to_basket_button = browser.find_element_by_xpath(
+                        '//form[@id="add_to_basket_form"]/button[@type="submit"]')
+                    browser.implicitly_wait(5)
+                    add_to_basket_button.click()
+                    browser.implicitly_wait(5)
 
-                number_of_products_before = len(browser.find_elements_by_xpath('//div[@class="basket-items"]'))
+            # Добавить товар в корзину со страницы раздела 'Все товары'
+            else:
 
-                assert number_of_products_before == 1, 'В корзину бы добавлен 1 товар. Количество товаров в корзине={} ' \
-                                                'и не соответствует ожидаемому.'.format(number_of_products_before)
+                # Добавить 1 товар в корзину
+                if (not add_two_products) and (not add_several_products):
+                    if len(all_products_on_current_page) >= 1:
+                        for i in range(1, len(all_products_on_current_page) + 1):
 
-        add_product_to_basket()
+                            # Если товар в наличии
+                            if len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0:
 
-        if clear_basket or repeate_add_product:
-            product_value = browser.find_element_by_xpath(
-                '//div[@class="checkout-quantity"]/div[@class="input-group  "]/input[@class="form-control"]')
-            sleep(1)
+                                # Добавить товар в корзину
+                                add_to_basket_button = browser.find_element_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                                browser.implicitly_wait(10)
+                                add_to_basket_button.click()
+                                num_products += 1
+                                break
+                            elif i == len(all_products_on_current_page) + 1:
+                                print('На странице нет ни одного товара в наличии.')
+                            else:
+                                continue
+
+                elif add_two_products:
+                    if len(all_products_on_current_page) > 2:
+                        for i in range(1, 3):
+
+                            # Если товар в наличии
+                            if len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0:
+
+                                # Добавить товар в корзину
+                                add_to_basket_button = browser.find_element_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                                browser.implicitly_wait(10)
+                                add_to_basket_button.click()
+                                num_products += 1
+                            elif i == 2:
+                                assert len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0, 'На странице нет ни одного товара в наличии.'
+                            else:
+                                continue
+                    else:
+                        for i in range(1, len(all_products_on_current_page) + 1):
+
+                            # Если товар в наличии
+                            if len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0:
+
+                                # Добавить товар в корзину
+                                add_to_basket_button = browser.find_element_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                                browser.implicitly_wait(10)
+                                add_to_basket_button.click()
+                                num_products += 1
+                            elif i == len(all_products_on_current_page):
+                                assert len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0, 'На странице нет ни одного товара в наличии.'
+                            else:
+                                continue
+
+                elif add_several_products:
+                    if len(all_products_on_current_page) > 5:
+                        for i in range(1, 6):
+
+                            # Если товар в наличии
+                            if len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0:
+
+                                # Добавить товар в корзину
+                                add_to_basket_button = browser.find_element_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                                browser.implicitly_wait(10)
+                                add_to_basket_button.click()
+                                num_products += 1
+                            elif i == 5:
+                                assert len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0, 'На странице нет ни одного товара в наличии.'
+                            else:
+                                continue
+                    else:
+                        for i in range(1, len(all_products_on_current_page) + 1):
+
+                            # Если товар в наличии
+                            if len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0:
+
+                                # Добавить товар в корзину
+                                add_to_basket_button = browser.find_element_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/form/button[@type="submit"]'.format(i))
+                                browser.implicitly_wait(10)
+                                add_to_basket_button.click()
+                                num_products += 1
+                            elif i == len(all_products_on_current_page):
+                                assert len(browser.find_elements_by_xpath(
+                                    '//li[{}]/article/div[@class="product_price"]/p[@class="instock availability"]'
+                                    ''.format(i))) != 0, 'На странице нет ни одного товара в наличии.'
+                            else:
+                                continue
+
+
+            # Перейти в корзину
+            go_to_basket_button = browser.find_element_by_xpath(
+                '//div[@class="basket-mini pull-right hidden-xs"]/span[@class="btn-group"]')
+            browser.implicitly_wait(5)
+            # sleep(1)
+            go_to_basket_button.click()
+            browser.implicitly_wait(5)
+
+            number_of_products_before = len(
+                browser.find_elements_by_xpath('//div[@class="basket-items"]'))
+
+            assert number_of_products_before == num_products, 'В корзину был(о) добавлен(о) {} товар(ов). Количество ' \
+                                                              'товаров в корзине={} и не соответствует ожидаемому.' \
+                                                              ''.format(num_products,
+                                                                        number_of_products_before)
+
+        add_products_to_basket()
+
+        def delete_products_using_clear():
+            """Удаление товаров из корзины, используя запись в поле количества '0' и кнопку 'Обновить'."""
+
+            # Количество товаров в корзине
+            number_of_products_in_basket = len(browser.find_elements_by_xpath('//div[@class="basket-items"]'))
+
+            # Удалить один товар из корзины
+            if del_one_using_clear:
+                # Поле 'Количество' строки товара в корзине
+                product_value = browser.find_element_by_xpath(
+                    '//div[{}]/div[@class="row"]/div[@class="col-sm-3"]/div/div/input[@class="form-control"]'
+                    ''.format(number_of_products_in_basket))
+                product_value.clear()
+                browser.implicitly_wait(5)
+                product_value.send_keys('0')
+                browser.implicitly_wait(5)
+                # Кнопка 'Обновить' строки товара в корзине
+                update_button = browser.find_element_by_xpath(
+                    '//div[{}]/div[@class="row"]/div[@class="col-sm-3"]/div/div/span/button[@class="btn btn-default"]'
+                    ''.format(number_of_products_in_basket))
+                update_button.click()
 
             # Очистить корзину
-            product_value.clear()
-            product_value.send_keys('0')
-            update_button = browser.find_element_by_xpath(
-                '//span[@class="input-group-btn"]/button[@class="btn btn-default"]')
-
-            browser.implicitly_wait(10)
-            update_button.click()
+            else:
+                for i in range(number_of_products_in_basket):
+                    # Поле 'Количество' строки товара в корзине
+                    product_value = browser.find_element_by_xpath(
+                        '//div[1]/div[@class="row"]/div[@class="col-sm-3"]/div/div/input[@class="form-control"]')
+                    product_value.clear()
+                    browser.implicitly_wait(5)
+                    product_value.send_keys('0')
+                    browser.implicitly_wait(5)
+                    # Кнопка 'Обновить' строки товара в корзине
+                    update_button = browser.find_element_by_xpath(
+                        '//div[1]/div[@class="row"]/div[@class="col-sm-3"]/div/div/span/button[@class="btn btn-default"]')
+                    update_button.click()
+                    sleep(1)
 
             number_of_products_after = len(browser.find_elements_by_xpath('//div[@class="basket-items"]'))
 
-            assert number_of_products_after == 0, 'В корзине был 1 товар, товар был удалён из корзины. ' \
-                                                  'Количество товаров в корзине={} и не равно 0.' \
-                                                  ''.format(number_of_products_after)
+            if del_one_using_clear:
+                assert number_of_products_after == \
+                       number_of_products_in_basket - 1, 'Был удалён 1 товар из корзины. Количество товаров в корзине ' \
+                                                         'до удаления={}.\n Количество товаров после удаления одного ' \
+                                                         'товара={} и не соответствует ожидаемому.' \
+                                                         ''.format(number_of_products_in_basket,
+                                                                   number_of_products_after)
+            else:
+                assert number_of_products_after == 0, 'Товары были удалёны из корзины. Количество товаров в корзине={} ' \
+                                                      'и не равно 0.'.format(number_of_products_after)
 
-            if repeate_add_product:
+        if clear_basket or repeat_add_product:
+            delete_products_using_clear()
+
+            if repeat_add_product:
                 go_to_home_page()
                 go_to_all_products()
-                add_product_to_basket()
+                add_products_to_basket()
 
     finally:
         browser.quit()
 
+
+
+def buy_product(link=link):
+    """Купить товар. """
+
+
+    try:
+        browser = webdriver.Chrome()
+        browser.get(link)
+        browser.implicitly_wait(10)
+
+        pass
+
+    finally:
+        browser.quit()
 
 
 def test_2_1_registration_true_data_and_delete_profile():
@@ -1052,7 +1238,7 @@ def test_2_1_registration_true_data_and_delete_profile():
 
 
 def test_2_2_registration_false_password():
-    """Регистрация. email - корректный, некорректный пароль - 8 символов (короткий пароль)"""
+    """Регистрация. email - корректный, некорректный пароль - 8 символов (короткий пароль)."""
 
     # input_email='true_email@test.ru'
     registration(link=link, input_password='12345678', password=False)
@@ -1060,7 +1246,7 @@ def test_2_2_registration_false_password():
 
 
 def test_2_3_registration_false_email():
-    """Регистрация. email - не содержит знак '@', корректный пароль - 9 символов"""
+    """Регистрация. email - не содержит знак '@', корректный пароль - 9 символов."""
 
     # input_password='truepassw'
     registration(link=link, input_email='email_test.ru', email=False)
@@ -1068,7 +1254,7 @@ def test_2_3_registration_false_email():
 
 
 def test_2_4_registration_empty_password():
-    """Регистрация. email - корректный, пустое поле пароля"""
+    """Регистрация. email - корректный, пустое поле пароля."""
 
     # input_email='true_email@test.ru'
     registration(link=link, input_password='', password=False)
@@ -1076,7 +1262,7 @@ def test_2_4_registration_empty_password():
 
 
 def test_2_5_registration_empty_email():
-    """Регистрация. Пустое поле email, корректный пароль - 9 символов"""
+    """Регистрация. Пустое поле email, корректный пароль - 9 символов."""
 
     # input_password='truepassw'
     registration(link=link, input_email='', email=False)
@@ -1084,9 +1270,8 @@ def test_2_5_registration_empty_email():
 
 
 def test_2_6_registration_empty_email_and_password():
-    """Регистрация. Пустое поле email, пустое поле пароля"""
+    """Регистрация. Пустое поле email, пустое поле пароля."""
 
-    # input_email='true_email@test.ru'
     registration(link=link, input_email='', email=False, input_password='', password=False)
     print('test_2_6_registration_empty_email_and_password - OK')
 
@@ -1099,12 +1284,12 @@ def test_2_7_log_in_true_data():
     print('test_2_3_log_in_true_data - OK')
 
 
-def test_2_8_repeate_log_in():
-    """Аутентификация пользователя. Выход из профиля. Повторная аутентификация"""
+def test_2_8_repeat_log_in():
+    """Аутентификация пользователя. Выход из профиля. Повторная аутентификация."""
 
     # input_email='true_email@test.ru', input_password='truepassw'
-    log_in(link=link, repeate_log_in=True)
-    print('test_2_4_repeate_log_in - OK')
+    log_in(link=link, repeat_log_in=True)
+    print('test_2_4_repeat_log_in - OK')
 
 
 def test_2_7_log_in_false_email():
@@ -1124,7 +1309,7 @@ def test_2_8_log_in_false_password():
 
 
 def test_2_9_change_password_true_data():
-    """Изменение пароля. Новый пароль - корректный, отличается от старого"""
+    """Изменение пароля. Новый пароль - корректный, отличается от старого."""
 
     log_in(link=link, change_password=True)
     print('test_2_9_change_password_true_data - OK')
@@ -1132,7 +1317,7 @@ def test_2_9_change_password_true_data():
 
 def test_2_10_change_password_false_data():
     """Изменение пароля. При измении пароля повторно вводится пароль,
-    отличный от пароля, введённого в первом поле"""
+    отличный от пароля, введённого в первом поле."""
 
     log_in(link=link, change_password=True, new_password=False)
     print('test_2_10_change_password_false_data - OK')
@@ -1145,52 +1330,94 @@ def test_2_11_cansel_delete_profile():
     print('test_2_11_cansel_delete_profile - OK')
 
 
-def test_2_12_add_one_product_to_basket(link=link):
-    """Добавить товар в корзину'"""
+def test_2_12_add_one_product_to_basket():
+    """Добавить 1 товар в корзину со страницы всех товаров"""
 
     add_product_to_basket_and_clear_basket(link=link)
     print('test_2_12_add_one_product_to_basket - OK')
 
 
-def test_2_13_clear_basket(link=link):
-    """Очистить корзину'"""
+def test_2_13_add_one_product_to_basket_from_product_page():
+    """Добавить 1 товар в корзину со страницы с описанием товара"""
+
+    add_product_to_basket_and_clear_basket(link=link, add_from_product_page=True)
+    print('test_2_13_add_one_product_to_basket_from_product_page - OK')
+
+
+def test_2_14_clear_basket_with_one_product():
+    """Очистить корзину с одним товаром, используя запись '0' в поле количества и кнопку 'Обновить'."""
 
     add_product_to_basket_and_clear_basket(link=link, clear_basket=True)
-    print('test_2_13_clear_basket - OK')
+    print('test_2_13_clear_basket_with_one_product - OK')
 
 
-def test_2_14_repeate_add_one_product_to_basket(link=link):
-    """Повторно добавить товар в корзину'"""
+def test_2_15_repeat_add_one_product_to_basket():
+    """Повторно добавить товар в корзину."""
 
-    add_product_to_basket_and_clear_basket(link=link, repeate_add_product=True)
-    print('test_2_14_repeate_add_one_product_to_basket - OK')
+    add_product_to_basket_and_clear_basket(link=link, repeat_add_product=True)
+    print('test_2_14_repeat_add_one_product_to_basket - OK')
 
+
+def test_2_16_add_two_products_to_basket():
+    """Добавить 2 товарова в корзину."""
+
+    add_product_to_basket_and_clear_basket(link=link, add_two_products=True)
+    print('test_2_15_add_two_products_to_basket - OK')
+
+
+def test_2_17_add_several_products_to_basket():
+    """Добавить несколько товаров в корзину."""
+
+    add_product_to_basket_and_clear_basket(link=link, add_several_products=True)
+    print('test_2_16_add_several_products_to_basket - OK')
+
+
+def test_2_18_delete_one_from_several_products_in_basket():
+    """Удалить один из нескольких товаров в корзине,
+    используя запись '0' в поле количества и кнопку 'Обновить'."""
+
+    add_product_to_basket_and_clear_basket(link=link, clear_basket=True, add_several_products=True,
+                                           del_one_using_clear=True)
+    print('test_2_17_delete_one_from_several_products_in_basket - OK')
+
+
+def test_2_19_clear_basket_with_several_products():
+    """Очистить корзину с несколькими товарами,
+    используя запись '0' в поле количества и кнопку 'Обновить'."""
+
+    add_product_to_basket_and_clear_basket(link=link, clear_basket=True, add_several_products=True)
+    print('test_2_18_clear_basket_with_several_products - OK')
 
 
 print('\n=========================== test session starts ===========================\n')
 
-# test_1_1_view_language_nav_bar()
-# test_1_2_view_log_in_registration_link()
-# test_1_3_view_home_page_title()
-# test_1_4_view_store_drop_down()
-# test_1_5_view_basket_button()
-# test_1_6_view_search_field_button()
-# test_1_7_view_log_in_registration_page()
-# test_1_8_view_top_log_in_registration_page()
-# test_1_9_view_all_products()
-# test_1_10_check_go_to_product_page_and_view_it()
+test_1_1_view_language_nav_bar()
+test_1_2_view_log_in_registration_link()
+test_1_3_view_home_page_title()
+test_1_4_view_store_drop_down()
+test_1_5_view_basket_button()
+test_1_6_view_search_field_button()
+test_1_7_view_log_in_registration_page()
+test_1_8_view_top_log_in_registration_page()
+test_1_9_view_all_products()
+test_1_10_check_go_to_product_page_and_view_it()
 
-# test_2_1_registration_true_data_and_delete_profile()
-# test_2_2_registration_false_password()
-# test_2_3_registration_false_email()
-# test_2_4_registration_empty_password()
-# test_2_5_registration_empty_email()
-# test_2_6_registration_empty_email_and_password()
-# test_2_7_log_in_false_email()
-# test_2_8_log_in_false_password()
-# test_2_9_change_password_true_data()
-# test_2_10_change_password_false_data()
-# test_2_11_cansel_delete_profile()
+test_2_1_registration_true_data_and_delete_profile()
+test_2_2_registration_false_password()
+test_2_3_registration_false_email()
+test_2_4_registration_empty_password()
+test_2_5_registration_empty_email()
+test_2_6_registration_empty_email_and_password()
+test_2_7_log_in_false_email()
+test_2_8_log_in_false_password()
+test_2_9_change_password_true_data()
+test_2_10_change_password_false_data()
+test_2_11_cansel_delete_profile()
 test_2_12_add_one_product_to_basket()
-test_2_13_clear_basket()
-test_2_14_repeate_add_one_product_to_basket()
+test_2_13_add_one_product_to_basket_from_product_page()
+test_2_14_clear_basket_with_one_product()
+test_2_15_repeat_add_one_product_to_basket()
+test_2_16_add_two_products_to_basket()
+test_2_17_add_several_products_to_basket()
+test_2_18_delete_one_from_several_products_in_basket()
+test_2_19_clear_basket_with_several_products()
